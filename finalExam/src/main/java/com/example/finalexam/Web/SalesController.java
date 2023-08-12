@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @SessionAttributes({"a","e"})
@@ -88,9 +89,55 @@ public class SalesController {
             mm.put("e", 0);
         }
 
-        return "redirect:MainPage";
+        return "redirect:/main";
     }
 
+    @GetMapping("/delete")
+    public String delete(Long id){
+        salesRepository.deleteById(id);
+        return "redirect:/main";
+    }
+    @GetMapping("/editSales")
+    public String editStudents(Model model, Long id, HttpSession session){
 
+        List<Category> categoryList;
+        List<Items> itemsList;
+        itemsList = itemRepository.findAll();
+        categoryList = categoryRepository.findAll();
+        num = 2;
+        session.setAttribute("info", 0);
+        Sales sale = salesRepository.findById(id).orElse(null);
+        if(sale==null) throw new RuntimeException("Patient does not exist");
+        model.addAttribute("sale", sale);
+        model.addAttribute("categoryList", categoryList);
+        model.addAttribute("itemsList", itemsList);
+        return "formSale";
+    }
+
+    @GetMapping(path="/")
+    public String sales1(Model model, @RequestParam(name="keyword",defaultValue = "")
+    String keyword){
+//
+        List<Sales> salesList;
+        List<Category> categoryList;
+        List<Items> itemsList;
+        itemsList = itemRepository.findAll();
+        categoryList = categoryRepository.findAll();
+
+        System.out.println(itemsList + "");
+
+
+        if (keyword.isEmpty()) {
+            salesList = salesRepository.findAll();
+        } else {
+            long key = Long.parseLong(keyword);
+            salesList = salesRepository.findSalesById(key);
+        }
+
+        model.addAttribute("salesList", salesList);
+        model.addAttribute("categoryList", categoryList);
+        model.addAttribute("itemsList", itemsList);
+        return "MainPage";
+    }
 
 }
