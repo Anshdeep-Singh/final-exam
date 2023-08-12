@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Thymeleaf Template</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        table {
+            text-align: center;
+            margin-top: 20px;
+            border-collapse: collapse;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+        }
+
+        form {
+            background-color: #3566b1;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        label, select, input[type="text"], input[type="number"], input[type="date"], button {
+            display: block;
+            margin: 10px 0;
+            width: 100%;
+        }
+
+        button {
+            background-color: white;
+            color: blue;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+<h1>Final Exam Set C</h1>
+<h1>Category Sales Summary Table</h1>
+
+<table>
+    <thead>
+    <tr>
+        <th>Category Code</th>
+        <th>Category Desc</th>
+        <th>Total Sales</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Use Thymeleaf iteration to populate table rows -->
+    <tr th:each="category : ${categories}">
+        <td th:text="${category.code}"></td>
+        <td th:text="${category.description}"></td>
+        <td th:text="${category.totalSales}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<form onsubmit="return validateForm()" method="post" th:action="@{saveSale}">
+    <label>Receipt number:</label>
+    <input type="text" name="receiptNumber" required>
+
+    <label>Item type:</label>
+    <select name="itemType" required>
+        <option th:each="item : ${itemsList}" th:value="${item.getItemCode()}" th:text="${item.getItemCode()}"></option>
+    </select>
+
+    <label>Quantity:</label>
+    <input type="number" id="quantityInput" name="quantity" required min="1">
+
+    <label>Transaction date:</label>
+    <input type="date" name="transactionDate" th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}">
+
+    <button type="submit">Save</button>
+</form>
+
+
+
+<table class="table">
+<thead>
+<tr>
+    <th>Receipt No</th><th>Item Code</th><th>Quantity</th><th>Transaction Data</th>
+</tr>
+</thead>
+<tr th:each="p:${salesList}">
+    <td th:text="${p.getReceiptNumber()}"></td>
+    <td th:text="${p.getItemCode()}"></td>
+    <td th:text="${p.getQuantity()}"></td>
+    <td th:text="${p.getDateOfSale()}"></td>
+    <td>
+        <a class="btn btn-danger" onClick="return confirm('Are you sure you want to delete
+        the record ?')" th:href="@{delete(id=${p.id})}">
+            Delete</a>
+    </td>
+    <td>
+        <a class="btn btn-success" th:href="@{editSales(id=${p.id})}">
+            Edit</a>
+    </td>
+</tr>
+</table>
+<script>
+    function validateForm() {
+        var quantity = document.getElementById("quantityInput").value;
+
+        if (quantity <= 0) {
+            alert("Quantity must be greater than zero.");
+            return false;
+        }
+
+        return true;
+    }
+</script>
+</body>
+</html>
